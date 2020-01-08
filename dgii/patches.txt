@@ -1,0 +1,4 @@
+dgii.patches.v1.add_item_type_to_item_doctype
+dgii.patches.v1.add_monto_facturado_bienes_to_purchase_invoice_doctype
+dgii.patches.v1.add_monto_facturado_servicios_to_purchase_invoice_doctype
+dgii.patches.v1.add_tax_type_to_sales_taxes_and_charges_doctype
