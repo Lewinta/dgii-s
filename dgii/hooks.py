@@ -21,27 +21,28 @@ fixtures = [
 		"filters": {
 			"name": (
 				"in", (
-					"Purchase Invoice-total_itbis",
+					"Customer-tipo_rnc",
+					"Item-item_type",
 					"Purchase Invoice Item-item_type",
-					"Purchase Invoice-legal_tip",
-					"Purchase Invoice-other_taxes",
 					"Purchase Invoice-excise_tax",
 					"Purchase Invoice-include_isr",
+					"Purchase Invoice-include_retention",
 					"Purchase Invoice-isr_amount",
 					"Purchase Invoice-isr_rate",
-					"Purchase Invoice-include_retention",
+					"Purchase Invoice-legal_tip",
+					"Purchase Invoice-monto_facturado_bienes",
+					"Purchase Invoice-monto_facturado_servicios",
+					"Purchase Invoice-other_taxes",
 					"Purchase Invoice-retention_amount",
 					"Purchase Invoice-retention_rate",
-					"Purchase Invoice-monto_facturado_servicios",
-					"Purchase Invoice-monto_facturado_bienes",
+					"Purchase Invoice-tax_id",
+					"Purchase Invoice-tipo_bienes_y_servicios_comprados",
+					"Purchase Invoice-total_itbis",
 					"Sales Invoice-ncf",
+					"Sales Invoice-return_against_ncf",
 					"Sales Invoice-tipo_de_anulacion",
 					"Sales Taxes and Charges-tax_type",
-					"Item-item_type",
-					"Purchase Invoice-tipo_bienes_y_servicios_comprados",
 					"Supplier-tipo_rnc",
-					"Customer-tipo_rnc",
-					"Purchase Invoice-tax_id",
 				)
 			)
 		}
@@ -130,13 +131,15 @@ doctype_js = {
 # Hook on document methods and events
 
 doc_events = {
+	# erpnext
 	"Purchase Invoice": {
 		"validate": "dgii.hook.purchase_invoice.validate",
 	},
-	"Sales Invoice": {
-		"before_insert": "dgii.hook.sales_invoice.before_insert",
-		"autoname": "dgii.hook.sales_invoice.autoname",
-	}
+    "Sales Invoice": {
+        "autoname": "dgii.hook.sales_invoice.autoname",
+        "before_insert": "dgii.hook.sales_invoice.before_insert",
+        "on_change": "dgii.hook.sales_invoice.on_change",
+    },
 }
 
 # Scheduled Tasks
@@ -171,4 +174,3 @@ doc_events = {
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "dgii.event.get_events"
 # }
-
