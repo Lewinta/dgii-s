@@ -14,7 +14,7 @@
         "dt": "Sales Invoice",
         "fetch_from": null,
         "fetch_if_empty": 0,
-        "fieldname": "tipo_de_factura",
+        "fieldname": "ncf",
         "fieldtype": "Data",
         "hidden": 0,
         "ignore_user_permissions": 0,
