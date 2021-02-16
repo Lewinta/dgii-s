@@ -27,6 +27,7 @@ def get_file_address(from_date,to_date):
 			pinv.retention_amount,
 			pinv.isr_amount,
 			pinv.total_itbis,
+			pinv.total_taxes_and_charges,
 			pinv.other_taxes,
 			pinv.legal_tip,
 			pinv.base_total,
@@ -87,16 +88,16 @@ def get_file_address(from_date,to_date):
 			row.monto_facturado_servicios,	# Monto Facturado en Servicios
 			row.monto_facturado_bienes,		# Monto Facturado en Bienes
 			row.base_total,					# Monto Facturado
-			row.total_itbis, # ITBIS Facturado
-			row.retention_amount or 0,  			# ITBIS Retenido
+			row.total_taxes_and_charges,	# ITBIS Facturado
+			row.retention_amount or 0,  	# ITBIS Retenido
 			'0',  							# ITBIS sujeto a Proporcionalidad (Art. 349)
-			row.total_itbis or 0, # ITBIS llevado al Costo
+			row.total_itbis or 0, 			# ITBIS llevado al Costo
 			'0',  							# ITBIS por Adelantar
 			'0',  							# ITBIS percibido en compras
 			'',  							# Tipo de Retención en ISR
-			row.isr_amount  or 0,  				# Monto Retención Renta
+			row.isr_amount  or 0,  			# Monto Retención Renta
 			'0',  							# ISR Percibido en compras
-			row.excise_tax or 0,  				# Impuesto Selectivo al Consumo
+			row.excise_tax or 0,  			# Impuesto Selectivo al Consumo
 			row.other_taxes or 0,  			# Otros Impuesto/Tasas
 			row.legal_tip,  				# Monto Propina Legal
 		])

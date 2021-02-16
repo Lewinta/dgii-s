@@ -94,6 +94,7 @@ fixtures = [
 doctype_js = {
 	"Purchase Invoice": "public/js/purchase_invoice.js",
 	"Customer": "public/js/customer.js",
+	"Supplier": "public/js/supplier.js",
 }
 
 # Generators
@@ -134,6 +135,7 @@ doc_events = {
 	# erpnext
 	"Purchase Invoice": {
 		"validate": "dgii.hook.purchase_invoice.validate",
+		"before_submit": "dgii.hook.purchase_invoice.before_submit",
 	},
     "Sales Invoice": {
         "autoname": "dgii.hook.sales_invoice.autoname",

@@ -21,6 +21,8 @@ frappe.ui.form.on('Comprobantes Conf', {
 			"Derecho a Credito Fiscal sin ITBIS": 5,
 			"Nota de Credito Final sin ITBIS": 6,
 			"Nota de Credito Fiscal  sin ITBIS": 7,
+			"Gastos Menores": 8,
+			"Suplidores Informales": 9,
 		}, frm.events.get_option.bind(frm));
 	},
 	get_option: function (value, label) {

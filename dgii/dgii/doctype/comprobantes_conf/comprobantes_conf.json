@@ -12,10 +12,12 @@
   "serie",
   "column_break_3",
   "description",
+  "expiration",
   "section_break_5",
   "current",
   "top",
   "column_break_9",
+  "tax_category",
   "document_type",
   "select_print_heading"
  ],
@@ -76,7 +78,7 @@
    "fieldname": "document_type",
    "fieldtype": "Select",
    "label": "Tipo de Documento",
-   "options": "0\n1\n2\n3\n4\n5\n6\n7",
+   "options": "0\n1\n2\n3\n4\n5\n6\n7\n8\n9",
    "reqd": 1
   },
   {
@@ -92,9 +94,23 @@
    "label": "Print Heading",
    "options": "Print Heading",
    "reqd": 1
+  },
+  {
+   "fieldname": "expiration",
+   "fieldtype": "Date",
+   "label": "Expiration",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tax_category",
+   "fieldtype": "Link",
+   "label": "Tax Category",
+   "options": "Tax Category",
+   "reqd": 1,
+   "unique": 1
   }
  ],
- "modified": "2020-11-16 22:38:23.543071",
+ "modified": "2021-02-12 18:57:35.672981",
  "modified_by": "Administrator",
  "module": "DGII",
  "name": "Comprobantes Conf",
@@ -109,6 +125,18 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
    "share": 1,
    "write": 1
   }

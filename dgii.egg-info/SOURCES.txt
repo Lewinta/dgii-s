@@ -19,6 +19,11 @@ dgii/config/desktop.py
 dgii/config/docs.py
 dgii/dgii/__init__.py
 dgii/dgii/doctype/__init__.py
+dgii/dgii/doctype/comprobantes_conf/__init__.py
+dgii/dgii/doctype/comprobantes_conf/comprobantes_conf.js
+dgii/dgii/doctype/comprobantes_conf/comprobantes_conf.json
+dgii/dgii/doctype/comprobantes_conf/comprobantes_conf.py
+dgii/dgii/doctype/comprobantes_conf/test_comprobantes_conf.py
 dgii/dgii/doctype/dgii_settings/__init__.py
 dgii/dgii/doctype/dgii_settings/dgii_settings.js
 dgii/dgii/doctype/dgii_settings/dgii_settings.json
