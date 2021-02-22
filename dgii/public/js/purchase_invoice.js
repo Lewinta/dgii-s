@@ -2,6 +2,7 @@ frappe.ui.form.on("Purchase Invoice", {
 	
 	validate(frm){
 		frm.trigger("bill_no");
+		frm.trigger("validate_cost_center");
 	},
 	bill_no(frm){
 		let {bill_no} = frm.doc;
@@ -36,6 +37,19 @@ frappe.ui.form.on("Purchase Invoice", {
 			return
 		}
 	},
+	validate_cost_center(frm){
+		if(!frm.doc.cost_center)
+			return
+		$.map(frm.doc.taxes, tax => {
+			if (!tax.cost_center)
+				tax.cost_center = frm.doc.cost_center;
+		})
+		$.map(frm.doc.items, tax => {
+			if (!tax.cost_center)
+				tax.cost_center = frm.doc.cost_center;
+		})
+
+	},
 	tax_id(frm){
 		if (!frm.doc.tax_id)
 			return
@@ -44,14 +58,15 @@ frappe.ui.form.on("Purchase Invoice", {
 	},
 	include_isr(frm){
 		frm.trigger("calculate_isr");
+		$.map(["retention_rate", "retention_type"], field => {
+			frm.set_df_property(field, 'reqd', frm.doc.include_isr);
+		})
 	},
 	isr_rate(frm){
 		frm.trigger("calculate_isr");
 	},
 	include_retention(frm){
-		$.map(["retention_rate", "retention_type"], field => {
-			frm.set_df_property(field, 'reqd', frm.doc.include_retention);
-		})
+		frm.set_df_property("retention_rate", 'reqd', frm.doc.include_retention);
 
 		frm.trigger("calculate_retention");
 	},

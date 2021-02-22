@@ -74,7 +74,9 @@ def get_file_address(from_date,to_date):
 		])
 		
 	for row in result:
-		bill_no = row.bill_no.split("-")[1] if(len(row.bill_no.split("-")) > 1) else row.bill_no # NCF-A1##% || A1##%
+		bill_no = ''
+		if row.bill_no:
+			bill_no = row.bill_no.split("-")[1] if(len(row.bill_no.split("-")) > 1) else row.bill_no # NCF-A1##% || A1##%
 		w.writerow([
 			row.tax_id, 	# RNC
 			row.tipo_rnc, 	# Tipo de RNC

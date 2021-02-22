@@ -95,6 +95,7 @@ doctype_js = {
 	"Purchase Invoice": "public/js/purchase_invoice.js",
 	"Customer": "public/js/customer.js",
 	"Supplier": "public/js/supplier.js",
+	"Landed Cost Voucher": "public/js/landed_cost_voucher.js",
 }
 
 # Generators
@@ -141,6 +142,9 @@ doc_events = {
         "autoname": "dgii.hook.sales_invoice.autoname",
         "before_insert": "dgii.hook.sales_invoice.before_insert",
         "on_change": "dgii.hook.sales_invoice.on_change",
+    },
+	"Landed Cost Voucher": {
+        "on_submit": "dgii.hook.landed_cost_voucher.on_submit",
     },
 }
 

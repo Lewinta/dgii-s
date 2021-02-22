@@ -23,7 +23,12 @@ def calculate_totals(doc):
 	doc.monto_facturado_servicios = total_servicios
 
 def generate_new(doc):
-	if doc.bill_no:
+	tax_category = frappe.db.get_value(
+		"Supplier",
+		doc.supplier,
+		"tax_category"
+	)
+	if doc.bill_no or not tax_category:
 		return
 
 	conf = get_serie_for_(doc)
@@ -37,12 +42,12 @@ def generate_new(doc):
 	current += 1
 
 	conf.current = current
-	# conf.db_update()
+	conf.db_update()
 
 	doc.bill_no = '{0}{1:08d}'.format(conf.serie.split(".")[0], current)
 	doc.vencimiento_ncf = conf.expiration
-	# doc.db_update()
-	# frappe.db.commit()
+	doc.db_update()
+	frappe.db.commit()
 
 
 def get_serie_for_(doc):
