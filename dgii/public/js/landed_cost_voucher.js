@@ -27,9 +27,15 @@ frappe.ui.form.on("Landed Cost Taxes and Charges", {
 	total(frm, cdt, cdn) {
 		frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
 	},
+    currency(frm, cdt, cdn) {
+        frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
+    },
 	purchase_taxes_and_charges_template(frm, cdt, cdn) {
 		frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
 	},
+    exchange_rate(frm, cdt, cdn) {
+        frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
+    },
     supplier_invoice(frm, cdt, cdn) {
         frm.script_manager.trigger("validate_ncf", cdt, cdn);
     },

@@ -90,7 +90,8 @@ def get_file_address(from_date,to_date):
 			row.monto_facturado_servicios,	# Monto Facturado en Servicios
 			row.monto_facturado_bienes,		# Monto Facturado en Bienes
 			row.base_total,					# Monto Facturado
-			row.total_taxes_and_charges,	# ITBIS Facturado
+			# row.total_taxes_and_charges,	# ITBIS Facturado Cecilia lo pidio actualizar on 25 feb 21
+			row.total_itbis,				# ITBIS Facturado
 			row.retention_amount or 0,  	# ITBIS Retenido
 			'0',  							# ITBIS sujeto a Proporcionalidad (Art. 349)
 			row.total_itbis or 0, 			# ITBIS llevado al Costo

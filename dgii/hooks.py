@@ -96,6 +96,7 @@ doctype_js = {
 	"Customer": "public/js/customer.js",
 	"Supplier": "public/js/supplier.js",
 	"Landed Cost Voucher": "public/js/landed_cost_voucher.js",
+	"Company": "public/js/company.js",
 }
 
 # Generators

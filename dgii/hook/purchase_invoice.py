@@ -121,6 +121,9 @@ def set_taxes(doc):
 			doc.set(tax.tax_type, total_amount)
 
 def validate_duplicate_ncf(doc):
+	if not doc.bill_no:
+		return 
+
 	filters = {
 		"tax_id": doc.tax_id,
 		"bill_no": doc.bill_no,
@@ -128,4 +131,7 @@ def validate_duplicate_ncf(doc):
 		"name": ["!=", doc.name],
 	}
 	if frappe.db.exists("Purchase Invoice", filters):
-		frappe.throw("Ya existe una factura registrada a nombre de este proveedor con el mismo NCF, favor verificar!")
+		frappe.throw("""
+			Ya existe una factura registrada a nombre de <b>{supplier_name}</b> 
+			con el mismo NCF <b>{bill_no}</b>, favor verificar!
+		""".format(**doc.as_dict()))
