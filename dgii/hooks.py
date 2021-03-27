@@ -97,6 +97,7 @@ doctype_js = {
 	"Supplier": "public/js/supplier.js",
 	"Landed Cost Voucher": "public/js/landed_cost_voucher.js",
 	"Company": "public/js/company.js",
+	"Purchase Order": "public/js/purchase_order.js",
 }
 
 # Generators
@@ -181,3 +182,4 @@ doc_events = {
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "dgii.event.get_events"
 # }
+	

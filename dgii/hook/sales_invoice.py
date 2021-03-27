@@ -27,10 +27,10 @@ def before_insert(doc, event):
         return False
 
     if doc.ncf and doc.return_against_ncf:
-        return False
+       return False
 
     if doc.is_return:
-        doc.return_against_ncf = doc.ncf
+       doc.return_against_ncf = doc.ncf
 
     doc.ncf = generate_new(doc)
 
@@ -66,10 +66,16 @@ def generate_new(doc):
 
 
 def get_serie_for_(doc):
-    return frappe.get_doc("Comprobantes Conf", {
-        "company": doc.company,
-        "serie": doc.naming_series
-    })
+    if doc.tax_category:
+        return frappe.get_doc("Comprobantes Conf", {
+            "company": doc.company,
+            "tax_category": doc.tax_category
+        })
+    else:
+        return frappe.get_doc("Comprobantes Conf", {
+            "company": doc.company,
+            "serie": doc.naming_series
+        })
 
 
 def fetch_print_heading_if_missing(doc, go_silently=False):

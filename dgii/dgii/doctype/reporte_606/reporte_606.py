@@ -26,6 +26,7 @@ def get_file_address(from_date,to_date):
 			pinv.base_taxes_and_charges_added,
 			pinv.retention_amount,
 			pinv.isr_amount,
+			pinv.retention_type,
 			pinv.total_itbis,
 			pinv.total_taxes_and_charges,
 			pinv.other_taxes,
@@ -97,7 +98,7 @@ def get_file_address(from_date,to_date):
 			row.total_itbis or 0, 			# ITBIS llevado al Costo
 			'0',  							# ITBIS por Adelantar
 			'0',  							# ITBIS percibido en compras
-			'',  							# Tipo de Retención en ISR
+			row.retention_type.split("-")[0] if row.retention_type else '',  							# Tipo de Retención en ISR
 			row.isr_amount  or 0,  			# Monto Retención Renta
 			'0',  							# ISR Percibido en compras
 			row.excise_tax or 0,  			# Impuesto Selectivo al Consumo

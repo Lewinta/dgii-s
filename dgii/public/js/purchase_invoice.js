@@ -7,11 +7,12 @@ frappe.ui.form.on("Purchase Invoice", {
 	bill_no(frm){
 		let {bill_no} = frm.doc;
 
+		frm.set_df_property("vencimiento_ncf", "reqd", !!bill_no);
+		
 		if (!bill_no)
 			return
 		
 		frm.set_value("bill_no", bill_no.trim().toUpperCase())
-		frm.set_df_property("vencimiento_ncf", "reqd", !!frm.doc.bill_no);
 		frm.trigger("validate_ncf")
 	},
 	validate_ncf(frm){

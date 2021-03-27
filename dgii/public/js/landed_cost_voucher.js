@@ -40,9 +40,15 @@ frappe.ui.form.on("Landed Cost Taxes and Charges", {
         frm.script_manager.trigger("validate_ncf", cdt, cdn);
     },
 	calculate_tax_amount(frm, cdt, cdn) {
-		const {tax, total, purchase_taxes_and_charges_template} = frappe.get_doc(cdt, cdn);
+		let {
+            tax, total, purchase_taxes_and_charges_template,
+            currency, exchange_rate
+        } = frappe.get_doc(cdt, cdn);
         const method = "dgii.hook.landed_cost_voucher.get_rate_from_template";
         const args = { "template": purchase_taxes_and_charges_template };
+        if (currency != 'DOP')
+            total = flt(total) * flt(exchange_rate)
+
         if (total && purchase_taxes_and_charges_template)
             frappe.call(method, args).then(({message}) => {
                 const amount = total * (1 + flt(message) / 100);
@@ -67,4 +73,12 @@ frappe.ui.form.on("Landed Cost Taxes and Charges", {
             return
         }
     },
+});
+
+frappe.ui.form.on("Landed Cost Item", {
+    item_code: (frm, cdt, cdn) => {
+        frappe.throw("Ran")
+        let row = locals[cdt][cdn];
+        frappe.model.set_value(cdt,cdn, "weight", flt(row.qty) * flt(row.weight_per_unit))
+    }
 });
