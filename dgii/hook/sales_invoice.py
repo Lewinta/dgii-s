@@ -42,7 +42,6 @@ def before_insert(doc, event):
 def on_change(doc, event):
     fetch_print_heading_if_missing(doc)
 
-
 def get_document_type(doc):
     conf = get_serie_for_(doc)
     doc.document_type = conf.document_type
@@ -50,7 +49,9 @@ def get_document_type(doc):
 
 def generate_new(doc):
     conf = get_serie_for_(doc)
-
+    
+    if not conf.serie:
+        return ''
     current = cint(conf.current)
 
     if cint(conf.top) and current >= cint(conf.top):
@@ -66,16 +67,14 @@ def generate_new(doc):
 
 
 def get_serie_for_(doc):
-    if doc.tax_category:
-        return frappe.get_doc("Comprobantes Conf", {
-            "company": doc.company,
-            "tax_category": doc.tax_category
-        })
-    else:
-        return frappe.get_doc("Comprobantes Conf", {
-            "company": doc.company,
-            "serie": doc.naming_series
-        })
+    if not doc.tax_category:
+        frappe.throw("Favor seleccionar en el cliente alguna categoria de impuestos")
+    
+    return frappe.get_doc("Comprobantes Conf", {
+        "company": doc.company,
+        "tax_category": doc.tax_category
+    })
+    
 
 
 def fetch_print_heading_if_missing(doc, go_silently=False):
