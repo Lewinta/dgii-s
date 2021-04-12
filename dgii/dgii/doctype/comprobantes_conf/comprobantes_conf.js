@@ -12,17 +12,29 @@ frappe.ui.form.on('Comprobantes Conf', {
 		this.set_df_property("document_type", "options", options);
 	},
 	get_options: function (frm) {
+		// return jQuery.map({
+		// 	"Consumidor Final": 0,
+		// 	"Derecho a Credito Fiscal": 1,
+		// 	"Nota de Credito Final": 2,
+		// 	"Nota de Credito Fiscal": 3,
+		// 	"Consumidor Final sin ITBIS": 4,
+		// 	"Derecho a Credito Fiscal sin ITBIS": 5,
+		// 	"Nota de Credito Final sin ITBIS": 6,
+		// 	"Nota de Credito Fiscal  sin ITBIS": 7,
+		// 	"Gastos Menores": 8,
+		// 	"Suplidores Informales": 9,
+		// }, frm.events.get_option.bind(frm));
 		return jQuery.map({
-			"Consumidor Final": 0,
-			"Derecho a Credito Fiscal": 1,
-			"Nota de Credito Final": 2,
-			"Nota de Credito Fiscal": 3,
-			"Consumidor Final sin ITBIS": 4,
-			"Derecho a Credito Fiscal sin ITBIS": 5,
-			"Nota de Credito Final sin ITBIS": 6,
-			"Nota de Credito Fiscal  sin ITBIS": 7,
-			"Gastos Menores": 8,
-			"Suplidores Informales": 9,
+			"Factura de Crédito Fiscal": 1,
+			"Factura de Consumo": 2,
+			"Notas de Débito": 3,
+			"Notas de Crédito": 4,
+			"Comprobante de Compras": 11,
+			"Registro Único de Ingresos": 12,
+			"Comprobante para Gastos Menores": 13,
+			"Comprobante de Regímenes Especiales": 14,
+			"Comprobante Gubernamental": 15,
+			"Comprobante para exportaciones": 16,
 		}, frm.events.get_option.bind(frm));
 	},
 	get_option: function (value, label) {
