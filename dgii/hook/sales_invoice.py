@@ -13,7 +13,7 @@ from frappe import _ as translate
 
 
 def autoname(doc, event):
-    doc.name = make_autoname("FACT-.#####")
+    doc.name = make_autoname(doc.naming_series)
 
 
 def before_insert(doc, event):
