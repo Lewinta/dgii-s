@@ -15,7 +15,6 @@ from frappe import _ as translate
 def autoname(doc, event):
     doc.name = make_autoname("FACT-.#####")
 
-
 def before_insert(doc, event):
     if not doc.naming_series:
         return False
@@ -26,7 +25,8 @@ def before_insert(doc, event):
     if doc.is_pos and doc.ncf:
         return False
 
-    if doc.ncf and doc.return_against_ncf:
+    # if doc.ncf and doc.return_against_ncf:
+    if doc.ncf:
        return False
 
     if doc.is_return:
