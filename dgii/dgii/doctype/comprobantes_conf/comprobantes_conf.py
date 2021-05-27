@@ -11,8 +11,14 @@ from frappe.utils.background_jobs import enqueue_doc
 
 class ComprobantesConf(Document):
 	def on_change(self):
-		self.method = "update_naming_series"
-		enqueue_doc(self.doctype, self.name, self.method, timeout=1000)
+		pass
+		# self.method = "update_naming_series"
+		# enqueue_doc(self.doctype, self.name, self.method, timeout=1000)
+
+	def on_trash(self):
+		pass
+		# self.method = "update_naming_series"
+		# enqueue_doc(self.doctype, self.name, self.method, timeout=1000)
 
 	def update_naming_series(self):
 		setter = frappe.new_doc("Property Setter")
@@ -54,9 +60,6 @@ class ComprobantesConf(Document):
 			WHERE enabled = 1
 			""")
 
-	def on_trash(self):
-		self.method = "update_naming_series"
-		enqueue_doc(self.doctype, self.name, self.method, timeout=1000)
 
 
 def on_doctype_update():
