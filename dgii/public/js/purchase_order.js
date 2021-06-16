@@ -1,4 +1,16 @@
 frappe.ui.form.on("Purchase Order", {
+    refresh(frm) {
+        frm.trigger("set_queries");
+    },
+    set_queries(frm) {
+        frm.set_query("cost_center", () => {
+            return {
+                filters: {
+                    is_group: 0
+                }
+            }
+        })
+    },
     calculate_total_weight: frm => {
         let total_weight = 0.0;
         $.map(frm.doc.items, item => {

@@ -26,7 +26,7 @@ def before_insert(doc, event):
     if doc.is_pos and doc.ncf:
         return False
 
-    if doc.ncf and doc.return_against_ncf:
+    if doc.ncf:
        return False
 
     if doc.is_return:
