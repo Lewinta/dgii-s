@@ -1,8 +1,8 @@
 frappe.ui.form.on("Purchase Invoice", {
-	
 	validate(frm){
 		frm.trigger("bill_no");
 		frm.trigger("validate_cost_center");
+		frm.trigger("validate_ncf")
 	},
 	bill_no(frm){
 		let {bill_no} = frm.doc;
@@ -13,11 +13,10 @@ frappe.ui.form.on("Purchase Invoice", {
 			return
 		
 		frm.set_value("bill_no", bill_no.trim().toUpperCase())
-		frm.trigger("validate_ncf")
 	},
 	validate_ncf(frm){
 		let len = frm.doc.bill_no.length;
-		let valid_prefix = ["B01", "B04", "B11", "B13", "B14", "B15", "E31"];
+		let valid_prefix = ["B01", "B04", "B11", "B13", "B14", "B15", "E31", "E34"];
 		if (![11, 13].includes(len)) {
 			frappe.msgprint(`El numero de comprobante tiene <b>${len}</b> caracteres, deben ser <b>11</b> o <b>13</b> para la serie E.`);
 			validated = false;
