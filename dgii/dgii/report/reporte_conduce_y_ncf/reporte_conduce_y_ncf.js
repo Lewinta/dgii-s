@@ -1,4 +1,4 @@
-// Copyright (c) 2016, Soldeva, SRL and contributors
+// Copyright (c) 2016, TzCode, S. R. L. and contributors
 // For license information, please see license.txt
 
 frappe.query_reports["Reporte Conduce y NCF"] = {

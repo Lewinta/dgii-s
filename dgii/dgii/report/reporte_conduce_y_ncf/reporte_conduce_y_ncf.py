@@ -1,4 +1,4 @@
-# Copyright (c) 2013, Soldeva, SRL and contributors
+# Copyright (c) 2013, TzCode, S. R. L. and contributors
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
@@ -79,4 +79,3 @@ def get_orders(filters):
 		from `tabSales Order`
 		where docstatus = 1 %s order by transaction_date desc, name desc""" %
 		conditions, filters, as_dict=1)
-

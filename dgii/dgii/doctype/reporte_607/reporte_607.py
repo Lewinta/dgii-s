@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2015, Soldeva, SRL and contributors
+# Copyright (c) 2015, TzCode, S. R. L. and contributors
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
@@ -14,11 +14,23 @@ class Reporte607(Document):
 
 @frappe.whitelist()
 def get_file_address(from_date, to_date):
-	result = frappe.db.sql("""SELECT cust.tax_id, sinv.ncf, sinv.posting_date, sinv.total_taxes_and_charges, sinv.tipo_de_ingreso, sinv.base_total 
-		FROM `tabSales Invoice` AS sinv 
-		JOIN tabCustomer AS cust on sinv.customer = cust.name 
-		WHERE sinv.ncf NOT LIKE '%s' AND cust.tax_id > 0 AND sinv.docstatus = 1 AND sinv.posting_date 
-		BETWEEN '%s' AND '%s' """ % ("SINV-%", from_date, to_date), as_dict=True)
+	result = frappe.db.sql("""
+		SELECT 
+			cust.tax_id, 
+			sinv.ncf, 
+			sinv.posting_date, 
+			sinv.total_taxes_and_charges, 
+			sinv.tipo_de_ingreso, 
+			sinv.base_total 
+		FROM 
+			`tabSales Invoice` AS sinv 
+		JOIN 
+			tabCustomer AS cust on sinv.customer = cust.name 
+		WHERE 
+			sinv.ncf NOT LIKE '%s' AND cust.tax_id > 0 AND sinv.docstatus = 1 AND sinv.posting_date 
+		BETWEEN
+			'%s' AND '%s' 
+	""" % ("SINV-%", from_date, to_date), as_dict=True)
 
 	w = UnicodeWriter()
 	w.writerow(['RNC', 'Tipo de RNC', 'NCF', 'NCF modificado', 'Fecha de impresion', 'ITBIS facturado', 'Tipo de Ingreso', 'Monto Total'])
@@ -37,7 +49,3 @@ def get_file_address(from_date, to_date):
 
 
  	
-
-
-
-

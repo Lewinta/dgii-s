@@ -77,7 +77,7 @@ def set_taxes(doc):
 
 	if conf.itbis_account:
 		total_tip = sum( 
-			[ row.tax_amount_after_discount_amount for row in filter(
+			[ row.base_tax_amount_after_discount_amount for row in filter(
 					lambda x: x.account_head == conf.itbis_account,
 					doc.taxes
 				)
@@ -88,7 +88,7 @@ def set_taxes(doc):
 
 	if conf.legal_tip_account:
 		total_tip = sum( 
-			[ row.tax_amount_after_discount_amount for row in filter(
+			[ row.base_tax_amount_after_discount_amount for row in filter(
 					lambda x: x.account_head == conf.legal_tip_account,
 					doc.taxes
 				)
@@ -99,7 +99,7 @@ def set_taxes(doc):
 		
 	if conf.excise_tax:
 		total_excise = sum( 
-			[ row.tax_amount_after_discount_amount for row in filter(
+			[ row.base_tax_amount_after_discount_amount for row in filter(
 					lambda x: x.account_head == conf.excise_tax,
 					doc.taxes
 				)
@@ -112,7 +112,7 @@ def set_taxes(doc):
 		for tax in conf.other_taxes:
 			total_amount = .000
 			total_amount = sum( 
-				[ row.tax_amount_after_discount_amount for row in filter(
+				[ row.base_tax_amount_after_discount_amount for row in filter(
 						lambda x: x.account_head == tax.account,
 						doc.taxes
 					)

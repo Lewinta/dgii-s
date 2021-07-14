@@ -4,7 +4,7 @@ from . import __version__ as app_version
 
 app_name = "dgii"
 app_title = "DGII"
-app_publisher = "Soldeva, SRL"
+app_publisher = "TzCode, S. R. L."
 app_description = "Una aplicacion para la generacion de los reportes que son enviados a la Direccion General de Impuestos Internos en la Republica Dominicana"
 app_icon = "octicon octicon-flame"
 app_color = "#469"

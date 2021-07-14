@@ -78,7 +78,7 @@
    "fieldname": "document_type",
    "fieldtype": "Select",
    "label": "Tipo de Documento",
-   "options": "1\n2\n3\n4\n11\n12\n13\n14\n15\n16",
+   "options": "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n13\n14\n15",
    "reqd": 1
   },
   {
@@ -110,8 +110,8 @@
    "unique": 1
   }
  ],
- "modified": "2021-04-12 17:41:43.055393",
- "modified_by": "Administrator",
+ "modified": "2021-06-18 17:33:44.328200",
+ "modified_by": "lewinvillar@tzcode.tech",
  "module": "DGII",
  "name": "Comprobantes Conf",
  "owner": "Administrator",
