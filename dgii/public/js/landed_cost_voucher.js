@@ -31,9 +31,13 @@ frappe.ui.form.on("Landed Cost Taxes and Charges", {
         frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
     },
 	purchase_taxes_and_charges_template(frm, cdt, cdn) {
-		frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
+		frappe.model.set_value(cdt, cdn, "tax_amount", 0.00);
+        frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
 	},
     exchange_rate(frm, cdt, cdn) {
+        frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
+    },
+    tax_amount(frm, cdt, cdn) {
         frm.script_manager.trigger("calculate_tax_amount", cdt, cdn);
     },
     supplier_invoice(frm, cdt, cdn) {
@@ -42,7 +46,7 @@ frappe.ui.form.on("Landed Cost Taxes and Charges", {
 	calculate_tax_amount(frm, cdt, cdn) {
 		let {
             tax, total, purchase_taxes_and_charges_template,
-            currency, exchange_rate
+            currency, exchange_rate, tax_amount
         } = frappe.get_doc(cdt, cdn);
         const method = "dgii.hook.landed_cost_voucher.get_rate_from_template";
         const args = { "template": purchase_taxes_and_charges_template };
@@ -51,7 +55,10 @@ frappe.ui.form.on("Landed Cost Taxes and Charges", {
 
         if (total && purchase_taxes_and_charges_template)
             frappe.call(method, args).then(({message}) => {
-                const amount = total * (1 + flt(message) / 100);
+                const tax = !!tax_amount && tax_amount > 0 ? tax_amount : flt(total * (flt(message) / 100)) ;
+                const amount = total + tax ;
+                
+                frappe.model.set_value(cdt, cdn, "tax_amount", tax);
                 frappe.model.set_value(cdt, cdn, "amount", amount);
             })
         else

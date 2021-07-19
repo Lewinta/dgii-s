@@ -11,12 +11,19 @@ from frappe.model.naming import make_autoname
 
 from frappe import _ as translate
 
+MAX_VALUE_AVALIABLE = 250000
 
 def autoname(doc, event):
     doc.name = make_autoname(doc.naming_series)
 
 
 def before_insert(doc, event):
+
+    if doc.base_total >= MAX_VALUE_AVALIABLE:
+        ct = frappe.get_doc('Customer',doc.customer)
+        if not ct.tax_id:
+            frappe.throw('Para realizar ventas por un monto igual o mayor a los RD$250,000, el cliente debe de tener un RNC o Cédula asociado.')
+  
     if not doc.naming_series:
         return False
 
@@ -31,6 +38,8 @@ def before_insert(doc, event):
 
     if doc.is_return:
        doc.return_against_ncf = doc.ncf
+    
+            
 
     doc.ncf = generate_new(doc)
 

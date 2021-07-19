@@ -27,7 +27,7 @@ def get_file_address(from_date, to_date):
 		JOIN 
 			tabCustomer AS cust on sinv.customer = cust.name 
 		WHERE 
-			sinv.ncf NOT LIKE '%s' AND cust.tax_id > 0 AND sinv.docstatus = 1 AND sinv.posting_date 
+			sinv.ncf NOT LIKE '%s' AND sinv.docstatus = 1 AND sinv.posting_date 
 		BETWEEN
 			'%s' AND '%s' 
 	""" % ("SINV-%", from_date, to_date), as_dict=True)
@@ -37,7 +37,7 @@ def get_file_address(from_date, to_date):
 		
 	for row in result:
 		tipo_rnc = frappe.get_value("Customer", {"tax_id": row.tax_id }, ["tipo_rnc"])
-		w.writerow([row.tax_id.replace("-", ""), tipo_rnc, row.ncf, "", row.posting_date.strftime("%Y%m%d"), row.total_taxes_and_charges, row.tipo_de_ingreso, row.base_total])
+		w.writerow([row.tax_id.replace("-", "") if row.tax_id else "", tipo_rnc, row.ncf, "", row.posting_date.strftime("%Y%m%d"), row.total_taxes_and_charges, row.tipo_de_ingreso, row.base_total])
 
 	frappe.response['result'] = cstr(w.getvalue())
 	frappe.response['type'] = 'csv'

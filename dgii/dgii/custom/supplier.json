@@ -194,29 +194,6 @@
    "property": "in_standard_filter",
    "property_type": "Check",
    "value": "1"
-  },
-  {
-   "_assign": null,
-   "_comments": null,
-   "_liked_by": null,
-   "_user_tags": null,
-   "creation": "2020-10-13 00:36:42.868314",
-   "default_value": null,
-   "doc_type": "Supplier",
-   "docstatus": 0,
-   "doctype_or_field": "DocField",
-   "field_name": "naming_series",
-   "idx": 0,
-   "modified": "2020-10-13 00:36:42.868314",
-   "modified_by": "Administrator",
-   "name": "Supplier-naming_series-options",
-   "owner": "Administrator",
-   "parent": null,
-   "parentfield": null,
-   "parenttype": null,
-   "property": "options",
-   "property_type": "Text",
-   "value": "SUP-.YYYY.-"
   }
  ],
  "sync_on_migrate": 1
