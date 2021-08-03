@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "allow_rename": 1,
  "autoname": "format:{description} - {abbr}",
  "creation": "2020-07-10 17:25:45.706799",
@@ -29,11 +30,15 @@
    "label": "Enabled"
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "company",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Company",
    "options": "Company",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "serie",
@@ -107,11 +112,12 @@
    "label": "Tax Category",
    "options": "Tax Category",
    "reqd": 1,
-   "unique": 1
+   "search_index": 1
   }
  ],
- "modified": "2021-06-18 17:33:44.328200",
- "modified_by": "lewinvillar@tzcode.tech",
+ "links": [],
+ "modified": "2021-08-02 22:49:11.398788",
+ "modified_by": "Administrator",
  "module": "DGII",
  "name": "Comprobantes Conf",
  "owner": "Administrator",

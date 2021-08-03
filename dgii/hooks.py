@@ -89,6 +89,8 @@ fixtures = [
 # Website user home page (by function)
 # get_website_user_home_page = "dgii.utils.get_home_page"
 
+
+after_migrate = "dgii.hook.migrate.after_migrate"
 # Doctype JS
 # ----------
 doctype_js = {
