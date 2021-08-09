@@ -1,6 +1,25 @@
 import frappe
+
+# from frappe import _
+
 from frappe.utils import flt, add_days, nowdate
 from erpnext.controllers.accounts_controller import get_taxes_and_charges
+# from erpnext.stock.doctype.landed_cost_voucher.landed_cost_voucher import LandedCostVoucher
+
+# def landed_cost_voucher_validate_override(self):
+# 	self.check_mandatory()
+
+# 	set_applicable_charges_for_item(self)
+# 	if not self.get("items"):
+# 		self.get_items_from_purchase_receipts()
+# 	else:
+# 		self.validate_applicable_charges_for_item()
+# 	self.validate_purchase_receipts()
+# 	self.validate_expense_accounts()
+# 	self.set_total_taxes_and_charges()
+
+
+# LandedCostVoucher.validate = landed_cost_voucher_validate_override
 
 def on_submit(doc, method):
 	if not doc.taxes:
@@ -84,7 +103,7 @@ def create_purchase_invoice(row):
 		"stock_qty": 1,
 		"expense_account": row.expense_account,
 		"remarks": row.description,
-		"rate": total if total else amount,
+		"rate": amount if amount else total,
 	})
 	p_inv.set_missing_values()
 	
@@ -129,4 +148,33 @@ def get_rate_from_template(template):
 			`tabPurchase Taxes and Charges`.parent = `tabPurchase Taxes and Charges Template`.name
 		WHERE
 			`tabPurchase Taxes and Charges`.parent = %s
-	""", template)[0][0])
+	""" , template)[0][0])
+	
+
+def set_applicable_charges_for_item(doc):
+	from frappe.model.meta import get_field_precision
+
+	landed_cost_voucher_item_meta = frappe.get_meta("Landed Cost Item")
+	applicable_charges_precision = get_field_precision(landed_cost_voucher_item_meta.get_field("applicable_charges"))
+	
+	if not len(doc.taxes):
+		return "continue"
+
+	total_item_cost = 0.0
+	based_on = doc.distribute_charges_based_on.lower()
+	for d in doc.items:
+		total_item_cost += flt(d.get(based_on))
+	
+
+	total_charges = 0.0
+	for item in doc.items:
+		item.applicable_charges = flt(item.get(based_on)) * flt(doc.total_taxes_and_charges) / flt(total_item_cost)
+		item.applicable_charges = flt(item.applicable_charges, applicable_charges_precision)
+		# ,currency=frappe.get_cached_value('Company',  doc.company,  "default_currency")
+		total_charges += item.applicable_charges
+	
+
+	if total_charges != doc.total_taxes_and_charges:
+		diff = doc.total_taxes_and_charges - flt(total_charges)
+		doc.items[-1].applicable_charges += diff
+	

@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 from . import __version__ as app_version
 
+# from .hook.landed_cost_voucher import landed_cost_voucher_validate_override
+
 app_name = "dgii"
 app_title = "DGII"
 app_publisher = "TzCode, S. R. L."

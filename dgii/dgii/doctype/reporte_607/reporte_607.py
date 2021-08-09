@@ -19,7 +19,7 @@ def get_file_address(from_date, to_date):
 			cust.tax_id, 
 			sinv.ncf, 
 			sinv.posting_date, 
-			sinv.total_taxes_and_charges, 
+			sinv.base_total_taxes_and_charges, 
 			sinv.tipo_de_ingreso, 
 			sinv.base_total 
 		FROM 
@@ -37,7 +37,7 @@ def get_file_address(from_date, to_date):
 		
 	for row in result:
 		tipo_rnc = frappe.get_value("Customer", {"tax_id": row.tax_id }, ["tipo_rnc"])
-		w.writerow([row.tax_id.replace("-", "") if row.tax_id else "", tipo_rnc, row.ncf, "", row.posting_date.strftime("%Y%m%d"), row.total_taxes_and_charges, row.tipo_de_ingreso, row.base_total])
+		w.writerow([row.tax_id.replace("-", "") if row.tax_id else "", tipo_rnc, row.ncf, "", row.posting_date.strftime("%Y%m%d"), row.base_total_taxes_and_charges, row.tipo_de_ingreso, row.base_total])
 
 	frappe.response['result'] = cstr(w.getvalue())
 	frappe.response['type'] = 'csv'
