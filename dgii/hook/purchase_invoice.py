@@ -1,10 +1,13 @@
 import frappe
 from frappe.utils import cint
 
+TAX_CATEGORIES_PERMITTED = ['Proveedor Informal','Gastos Menores']
+
 def validate(doc, event):
 	set_taxes(doc)
 	calculate_totals(doc)
 	validate_duplicate_ncf(doc)
+	set_against_ncf(doc)
 
 def before_submit(doc, event):
 	generate_new(doc)
@@ -28,7 +31,7 @@ def generate_new(doc):
 		doc.supplier,
 		"tax_category"
 	)
-	if doc.bill_no or not tax_category:
+	if doc.bill_no or not tax_category or not tax_category in TAX_CATEGORIES_PERMITTED:
 		return
 
 	conf = get_serie_for_(doc)
@@ -57,7 +60,9 @@ def get_serie_for_(doc):
 			"""Favor seleccionar una categoría de impuestos para el 
 			suplidor <a href='/desk#Form/Supplier/{0}'>{0}</a>""".format(doc.supplier_name)
 		)
-	
+
+
+
 	filters = {
 		"company": doc.company,
 		"tax_category": supplier_category,
@@ -135,3 +140,9 @@ def validate_duplicate_ncf(doc):
 			Ya existe una factura registrada a nombre de <b>{supplier_name}</b> 
 			con el mismo NCF <b>{bill_no}</b>, favor verificar!
 		""".format(**doc.as_dict()))
+
+def set_against_ncf(doc):
+	if not doc.return_against:
+		return
+	return_ncf = frappe.get_value(doc.doctype, doc.return_against, "bill_no")
+	doc.return_against_ncf = return_ncf

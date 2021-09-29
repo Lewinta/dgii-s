@@ -14,12 +14,21 @@ class Reporte606(Document):
 	pass
 
 @frappe.whitelist()
-def get_file_address(from_date,to_date):
+def get_file_address(from_date,to_date, cost_center=None):
+	conditions = [
+		"pinv.docstatus = 1",
+		"pinv.bill_date BETWEEN '{}' AND '{}'".format(from_date, to_date)  
+	]
+	if frappe.db.exists("Cost Center", cost_center):
+		conditions.append("pinv.cost_center = '{}'".format(cost_center))
+
+	conditions = " AND ".join(conditions)
 	result = frappe.db.sql("""
 		SELECT 
 			pinv.tax_id,
 			supl.tipo_rnc,
 			pinv.tipo_bienes_y_servicios_comprados,
+			pinv.return_against_ncf,
 			pinv.bill_no,
 			pinv.bill_date,
 			pinv.excise_tax,
@@ -41,11 +50,9 @@ def get_file_address(from_date,to_date):
 		ON 
 			supl.name = pinv.supplier
 		WHERE
-			pinv.docstatus = 1 
-		AND 
-			pinv.bill_date BETWEEN '%s' AND '%s' 
+			{conditions}
 
-	""" % (from_date,to_date), debug=True, as_dict=True)
+	""".format(conditions=conditions), debug=False, as_dict=True)
 	w = UnicodeWriter()
 	w.writerow([
 		'RNC o Cedula',
@@ -83,7 +90,7 @@ def get_file_address(from_date,to_date):
 			row.tipo_rnc, 	# Tipo de RNC
 			row.tipo_bienes_y_servicios_comprados,
 			bill_no,		# NCF
-			'',				# NCF modificado
+			row.return_against_ncf,				# NCF modificado
 			row.bill_date.strftime("%Y%m"), # FC AAAAMM
 			row.bill_date.strftime("%d"),	# FP DD
 			row.bill_date.strftime("%Y%m"), # FP AAAAMM

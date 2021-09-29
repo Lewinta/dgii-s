@@ -4,31 +4,33 @@ import frappe
 
 from frappe.utils import flt, add_days, nowdate
 from erpnext.controllers.accounts_controller import get_taxes_and_charges
-# from erpnext.stock.doctype.landed_cost_voucher.landed_cost_voucher import LandedCostVoucher
+from erpnext.stock.doctype.landed_cost_voucher.landed_cost_voucher import LandedCostVoucher
 
-# def landed_cost_voucher_validate_override(self):
-# 	self.check_mandatory()
+def landed_cost_voucher_validate_override(self):
+	self.check_mandatory()
 
-# 	set_applicable_charges_for_item(self)
-# 	if not self.get("items"):
-# 		self.get_items_from_purchase_receipts()
-# 	else:
-# 		self.validate_applicable_charges_for_item()
-# 	self.validate_purchase_receipts()
-# 	self.validate_expense_accounts()
-# 	self.set_total_taxes_and_charges()
+	set_applicable_charges_for_item(self)
+	if not self.get("items"):
+		self.get_items_from_purchase_receipts()
+	else:
+		self.validate_applicable_charges_for_item()
+	self.validate_purchase_receipts()
+	self.validate_expense_accounts()
+	self.set_total_taxes_and_charges()
 
 
-# LandedCostVoucher.validate = landed_cost_voucher_validate_override
+LandedCostVoucher.validate = landed_cost_voucher_validate_override
 
 def on_submit(doc, method):
 	if not doc.taxes:
 		return
 
 	for tax in doc.taxes:
-		if tax.create_invoice:
-			tax = tax.update({"company": doc.company})
-			create_purchase_invoice(tax)
+		if not tax.create_invoice:
+			continue
+
+		tax = tax.update({"company": doc.company})
+		create_purchase_invoice(tax)
 
 @frappe.whitelist()
 def create_purchase_invoice(row):
@@ -39,7 +41,9 @@ def create_purchase_invoice(row):
 		row = frappe.get_doc("Landed Cost Taxes and Charges", _row.name)
 
 	if row.invoice:
-		return "This LCV already has an invoice"
+		errmsg = "This LCV already has an invoice"
+
+		return errmsg
 
 	total  = abs(row.total)
 	amount = abs(row.amount)
@@ -103,7 +107,7 @@ def create_purchase_invoice(row):
 		"stock_qty": 1,
 		"expense_account": row.expense_account,
 		"remarks": row.description,
-		"rate": amount if amount else total,
+		"rate": row.non_base_sub_total,
 	})
 	p_inv.set_missing_values()
 	
@@ -122,6 +126,8 @@ def create_purchase_invoice(row):
 	p_inv.calculate_taxes_and_totals()
 	p_inv.save()
 	p_inv.submit()
+
+
 	row.update({
 		"invoice": p_inv.name,
 		"date": p_inv.posting_date, 
