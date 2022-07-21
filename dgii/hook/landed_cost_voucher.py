@@ -30,12 +30,11 @@ def on_submit(doc, method):
 			continue
 
 		tax = tax.update({"company": doc.company})
-		create_purchase_invoice(tax)
+		create_purchase_invoice(tax, doc)
 
 @frappe.whitelist()
-def create_purchase_invoice(row):
+def create_purchase_invoice(row, doc):
 	import json
-
 	if type(row) == str:
 		_row = frappe._dict(json.loads(row))
 		row = frappe.get_doc("Landed Cost Taxes and Charges", _row.name)
@@ -73,13 +72,13 @@ def create_purchase_invoice(row):
 		"supplier": row.supplier,
 		"posting_date": inv_date,
 		"date": inv_date,
-		"bill_no": inv_date,
 		"bill_date": inv_date,
 		"supplier_invoice_no": row.supplier_invoice_no,
 		"tipo_bienes_y_servicios_comprados": row.tipo_bienes_y_servicios_comprados,
 		"company": frappe.db.get_value("Landed Cost Voucher", row.parent, "company"),
 		"due_date": add_days(inv_date, 30),
 		"update_stock": 0,
+		"import_entry": doc.import_entry,
 		"cost_center": row.cost_center,
 		"credit_to": credit_obj[row.currency],
 		"is_petty_cash": row.is_petty_cash,
@@ -91,7 +90,7 @@ def create_purchase_invoice(row):
 		"currency": row.currency or "DOP",
 		"price_list_currency": row.currency or "DOP",
 		"party_account_currency": row.currency or "DOP",
-		"exchange_rate": row.exchange_rate or "1",
+		"conversion_rate": row.exchange_rate or "1",
 		"account": row.expense_account,
 	})
 	# Let's create the item if doesn't exists
@@ -122,7 +121,6 @@ def create_purchase_invoice(row):
 			})
 			p_inv.append("taxes", r)
 	
-
 	p_inv.calculate_taxes_and_totals()
 	p_inv.save()
 	p_inv.submit()
