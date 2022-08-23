@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "allow_rename": 1,
  "autoname": "format:{description} - {abbr}",
  "creation": "2020-07-10 17:25:45.706799",
@@ -78,7 +79,7 @@
    "fieldname": "document_type",
    "fieldtype": "Select",
    "label": "Tipo de Documento",
-   "options": "1\n2\n3\n4\n11\n12\n13\n14\n15\n16",
+   "options": "1\n2\n3\n4\n11\n12\n13\n14\n15\n16\n17",
    "reqd": 1
   },
   {
@@ -106,11 +107,11 @@
    "fieldtype": "Link",
    "label": "Tax Category",
    "options": "Tax Category",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   }
  ],
- "modified": "2021-04-12 17:41:43.055393",
+ "links": [],
+ "modified": "2022-04-20 14:12:53.449228",
  "modified_by": "Administrator",
  "module": "DGII",
  "name": "Comprobantes Conf",

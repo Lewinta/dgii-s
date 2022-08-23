@@ -52,6 +52,7 @@ fixtures = [
 		"filters": {
 			"name": (
 				"in", (
+					"Purchase Invoice-apply_tds-hidden",
 					"Sales Invoice-naming_series-options",
 					"Sales Invoice-naming_series-description",
 					"Sales Invoice-naming_series-default",
@@ -59,6 +60,7 @@ fixtures = [
 					"Sales Invoice-naming_series-label",
 					"Sales Invoice-naming_series-bold",
 					"Sales Invoice-naming_series-reqd",
+					"Supplier-tax_withholding_category-hidden",
 				)
 			)
 		}
@@ -98,6 +100,7 @@ doctype_js = {
 	"Landed Cost Voucher": "public/js/landed_cost_voucher.js",
 	"Company": "public/js/company.js",
 	"Purchase Order": "public/js/purchase_order.js",
+	"Payment Entry": "public/js/payment_entry.js",
 }
 
 # Generators
@@ -170,6 +173,11 @@ doc_events = {
 # 		"dgii.tasks.monthly"
 # 	]
 # }
+
+# Migrate
+# -------
+
+after_migrate = "dgii.migrate.after_migrate"
 
 # Testing
 # -------

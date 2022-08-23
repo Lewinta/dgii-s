@@ -95,8 +95,8 @@ def get_file_address(from_date,to_date):
 			row.total_itbis,				# ITBIS Facturado
 			row.retention_amount or 0,  	# ITBIS Retenido
 			'0',  							# ITBIS sujeto a Proporcionalidad (Art. 349)
-			row.total_itbis or 0, 			# ITBIS llevado al Costo
 			'0',  							# ITBIS por Adelantar
+			row.total_itbis or 0, 			# ITBIS llevado al Costo
 			'0',  							# ITBIS percibido en compras
 			row.retention_type.split("-")[0] if row.retention_type else '',  							# Tipo de Retención en ISR
 			row.isr_amount  or 0,  			# Monto Retención Renta
