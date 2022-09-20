@@ -43,6 +43,7 @@ fixtures = [
 					"Sales Invoice-tipo_de_anulacion",
 					"Sales Taxes and Charges-tax_type",
 					"Supplier-tipo_rnc",
+					"Sales Invoice-tipo_de_ingreso",
 				)
 			)
 		}
@@ -147,6 +148,7 @@ doc_events = {
         "autoname": "dgii.hook.sales_invoice.autoname",
         "before_insert": "dgii.hook.sales_invoice.before_insert",
         "on_change": "dgii.hook.sales_invoice.on_change",
+        "on_trash": "dgii.hook.sales_invoice.on_trash",
     },
 	"Landed Cost Voucher": {
         "on_submit": "dgii.hook.landed_cost_voucher.on_submit",

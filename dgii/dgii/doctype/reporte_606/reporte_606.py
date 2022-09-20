@@ -33,7 +33,8 @@ def get_file_address(from_date,to_date):
 			pinv.legal_tip,
 			pinv.base_total,
 			pinv.monto_facturado_servicios,
-			pinv.monto_facturado_bienes
+			pinv.monto_facturado_bienes,
+			pinv.mop
 		FROM 
 			`tabPurchase Invoice` AS pinv
 		LEFT JOIN 
@@ -72,6 +73,7 @@ def get_file_address(from_date,to_date):
 		'Impuesto Selectivo al Consumo',
 		'Otros Impuesto/Tasas',
 		'Monto Propina Legal',
+		'Forma de Pago',
 		])
 		
 	for row in result:
@@ -79,7 +81,7 @@ def get_file_address(from_date,to_date):
 		if row.bill_no:
 			bill_no = row.bill_no.split("-")[1] if(len(row.bill_no.split("-")) > 1) else row.bill_no # NCF-A1##% || A1##%
 		w.writerow([
-			row.tax_id, 	# RNC
+			row.tax_id.replace("-", "") if row.tax_id else "", 	# RNC
 			row.tipo_rnc, 	# Tipo de RNC
 			row.tipo_bienes_y_servicios_comprados,
 			bill_no,		# NCF
@@ -98,12 +100,14 @@ def get_file_address(from_date,to_date):
 			'0',  							# ITBIS por Adelantar
 			row.total_itbis or 0, 			# ITBIS llevado al Costo
 			'0',  							# ITBIS percibido en compras
-			row.retention_type.split("-")[0] if row.retention_type else '',  							# Tipo de Retención en ISR
+			# row.retention_type.split("-")[0] if row.retention_type else '',  							# Tipo de Retención en ISR
+			row.retention_type,				# Tipo de Retención en ISR
 			row.isr_amount  or 0,  			# Monto Retención Renta
 			'0',  							# ISR Percibido en compras
 			row.excise_tax or 0,  			# Impuesto Selectivo al Consumo
 			row.other_taxes or 0,  			# Otros Impuesto/Tasas
 			row.legal_tip,  				# Monto Propina Legal
+			row.mop, 						# Forma de Pago
 		])
 										
 	frappe.response['result'] = cstr(w.getvalue())

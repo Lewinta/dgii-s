@@ -31,7 +31,7 @@ def before_insert(doc, event):
     if doc.is_pos and doc.ncf:
         return False
 
-    if doc.ncf:
+    if doc.ncf and not doc.is_return:
        return False
 
     if doc.is_return:
@@ -78,6 +78,19 @@ def get_serie_for_(doc):
     if not doc.tax_category:
         frappe.throw("Favor seleccionar en el cliente alguna categoria de impuestos")
     
+    if doc.is_return:
+        
+        credit_note = frappe.get_doc("Comprobantes Conf", {
+            "company": doc.company,
+            "document_type": '4'
+        })
+        if not credit_note:
+            frappe.throw("Favor crear una configuracion para las notas de credito")
+        
+        doc.tax_category = credit_note.tax_category
+
+        return credit_note
+
     return frappe.get_doc("Comprobantes Conf", {
         "company": doc.company,
         "tax_category": doc.tax_category
