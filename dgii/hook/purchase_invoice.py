@@ -127,7 +127,7 @@ def validate_duplicate_ncf(doc):
 	filters = {
 		"tax_id": doc.tax_id,
 		"bill_no": doc.bill_no,
-		"docstatus": 1,
+		"docstatus": ["!=", 2],
 		"name": ["!=", doc.name],
 	}
 	if frappe.db.exists("Purchase Invoice", filters):

@@ -8,6 +8,4 @@ from frappe.model.document import Document
 from dgii.hook.ncf import update_series_ncf
 
 class DGIISettings(Document):
-	def validate(self):
-		for ncf in self.comprobantes_fiscales:
-			update_series_ncf(ncf)
+	pass

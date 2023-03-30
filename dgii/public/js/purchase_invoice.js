@@ -1,4 +1,22 @@
 frappe.ui.form.on("Purchase Invoice", {
+	
+	refresh(frm){
+		frm.set_query("ibtis_retention_type", () => {
+			return {
+				"filters": {
+					"isr": 0
+				}
+			}
+		})
+		
+		frm.set_query("isr_type", () => {
+			return {
+				"filters": {
+					"isr": 1
+				}
+			}
+		})
+	},
 	validate(frm){
 		frm.trigger("bill_no");
 		frm.trigger("validate_cost_center");

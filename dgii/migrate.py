@@ -28,66 +28,64 @@ def create_views():
     """)
     
     frappe.db.sql("""
-    CREATE OR REPLACE VIEW `view607 Payments` as
-       SELECT 
-        `tabSales Invoice`.`name` as `sinv_name`,
-        SUM(
-            IF(
-                `tabSales Invoice`.`posting_date` = `tabPayment Entry`.`posting_date` AND
-                `tabMode of Payment`.`type` = 'Cash' AND
+    CREATE OR REPLACE VIEW `view607 Payments` 
+    AS 
+    select 
+        `tabSales Invoice`.`name` AS `sinv_name`,
+        sum(
+            if(
+                `tabSales Invoice`.`posting_date` = `tabPayment Entry`.`posting_date` and 
+                `tabMode of Payment`.`type` = 'Cash' and 
                 `tabSales Invoice`.`outstanding_amount` = 0,
-                `tabPayment Entry Reference`.`allocated_amount`,
-                0
+                `tabPayment Entry Reference`.`allocated_amount`,0
             )
-        ) `cash_payment`,
-        SUM(
-            IF(
-                `tabSales Invoice`.`posting_date` = `tabPayment Entry`.`posting_date` AND
-                `tabMode of Payment`.`type` = 'Bank' AND
+        ) AS `cash_payment`,
+        sum(
+            if(
+                `tabSales Invoice`.`posting_date` = `tabPayment Entry`.`posting_date` and 
+                `tabMode of Payment`.`type` = 'Bank' and 
                 `tabSales Invoice`.`outstanding_amount` = 0,
-                `tabPayment Entry Reference`.`allocated_amount`,
-                0
+                `tabPayment Entry Reference`.`allocated_amount`,0
             )
-        ) `bank_payment`,
-        SUM(
-            IF(
-                `tabSales Invoice`.`posting_date` = `tabPayment Entry`.`posting_date` AND
-                `tabMode of Payment`.`type` = 'Credit Card' AND
+        ) AS `bank_payment`,
+        sum(
+            if(
+                `tabSales Invoice`.`posting_date` = `tabPayment Entry`.`posting_date` and
+                `tabMode of Payment`.`type` = 'Credit Card' and
                 `tabSales Invoice`.`outstanding_amount` = 0,
-                `tabPayment Entry Reference`.`allocated_amount`,
-                0
+                `tabPayment Entry Reference`.`allocated_amount`,0
             )
-        ) `cc_payment`,
-        IF(
-                `tabSales Invoice`.`posting_date` != `tabPayment Entry`.`posting_date`,
-                `tabSales Invoice`.`base_grand_total`,
-                0
-            ) as `credit`,
+        ) AS `cc_payment`,
+        if(
+            `tabSales Invoice`.`posting_date` <> `tabPayment Entry`.`posting_date`,
+            `tabSales Invoice`.`base_grand_total`,
+            0
+        ) AS `credit`,
+        `tabPayment Entry`.`mode_of_payment` AS `mode_of_payment` 
+    from    
+        `tabPayment Entry` 
+    join 
+        `tabMode of Payment` 
+    on
+        `tabPayment Entry`.`mode_of_payment` = `tabMode of Payment`.`name`
+    join 
+        `tabPayment Entry Reference` 
+    on
+        `tabPayment Entry`.`name` = `tabPayment Entry Reference`.`parent`
+    and 
+        `tabPayment Entry`.`docstatus` = 1 
+    and 
+        `tabPayment Entry Reference`.`reference_doctype` = 'Sales Invoice'
 
-        `tabPayment Entry`.mode_of_payment
-    FROM
+    join 
         `tabSales Invoice`
-    ON
-        `tabPayment Entry Reference`.reference_doctype = 'Sales Invoice'
-    AND
-        `tabPayment Entry Reference`.reference_name = `tabSales Invoice`.name
-    AND
-        `tabSales Invoice`.docstatus = 1
-    LEFT JOIN 
-        `tabPayment Entry`
-    LEFT JOIN
-        `tabMode of Payment`
-    ON
-        `tabPayment Entry`.mode_of_payment = `tabMode of Payment`.name
-    LEFT JOIN
-        `tabPayment Entry Reference`
-    ON
-        `tabPayment Entry`.name = `tabPayment Entry Reference`.parent
-    AND
-        `tabPayment Entry`.docstatus = 1
-    AND
-        `tabPayment Entry Reference`.reference_doctype = 'Sales Invoice'
-    GROUP BY 
-        `tabSales Invoice`.name	
+    on
+        `tabPayment Entry Reference`.`reference_doctype` = 'Sales Invoice'
+    and 
+        `tabPayment Entry Reference`.`reference_name` = `tabSales Invoice`.`name`
+    and 
+        `tabSales Invoice`.`docstatus` = 1
+        
+    group by `tabSales Invoice`.`name`
 
     """)

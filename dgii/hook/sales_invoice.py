@@ -11,17 +11,20 @@ from frappe.model.naming import make_autoname
 
 from frappe import _ as translate
 
-MAX_VALUE_AVALIABLE = 250000
+MAX_VALUE_AVAILABLE = 250000
+
 
 def autoname(doc, event):
     doc.name = make_autoname(doc.naming_series)
 
+
 def before_insert(doc, event):
-    if doc.base_total >= MAX_VALUE_AVALIABLE:
+    if flt(doc.base_total) >= MAX_VALUE_AVAILABLE:
         ct = frappe.get_doc('Customer', doc.customer)
         if not ct.tax_id:
-            frappe.throw('Para realizar ventas por un monto igual o mayor a los RD$250,000. El cliente debe de tener un RNC o Cédula asociado.')
-  
+            frappe.throw(
+                'Para realizar ventas por un monto igual o mayor a los RD$250,000. El cliente debe de tener un RNC o Cédula asociado.')
+
     if not doc.naming_series:
         return False
 
@@ -32,13 +35,13 @@ def before_insert(doc, event):
         return False
 
     if doc.ncf and not doc.is_return:
-       return False
+        return False
 
     if doc.is_return:
-       doc.return_against_ncf = doc.ncf
-    
+        doc.return_against_ncf = doc.ncf
+
     conf = get_serie_for_(doc)
-        
+
     if not conf.serie:
         return ''
     current = cint(conf.current)
@@ -57,6 +60,7 @@ def before_insert(doc, event):
 
     return True
 
+
 def on_trash(doc, event):
     if is_last_document(doc):
         # Let's revert last assigned ncf
@@ -67,26 +71,35 @@ def on_trash(doc, event):
         conf.current -= 1
         conf.db_update()
 
+
 def on_change(doc, event):
     fetch_print_heading_if_missing(doc)
+
 
 def get_document_type(doc):
     conf = get_serie_for_(doc)
     doc.document_type = conf.document_type
 
+
 def get_serie_for_(doc):
     if not doc.tax_category:
-        frappe.throw("Favor seleccionar en el cliente alguna categoria de impuestos")
-    
+        doc.tax_category = frappe.get_value(
+            "Customer", doc.customer, "tax_category")
+
+    if not doc.tax_category:
+        frappe.throw(
+            "Favor seleccionar en el cliente alguna categoria de impuestos")
+
     if doc.is_return:
-        
+
         credit_note = frappe.get_doc("Comprobantes Conf", {
             "company": doc.company,
             "document_type": '4'
         })
         if not credit_note:
-            frappe.throw("Favor crear una configuracion para las notas de credito")
-        
+            frappe.throw(
+                "Favor crear una configuracion para las notas de credito")
+
         doc.tax_category = credit_note.tax_category
 
         return credit_note
@@ -95,7 +108,8 @@ def get_serie_for_(doc):
         "company": doc.company,
         "tax_category": doc.tax_category
     })
-    
+
+
 def is_last_document(doc):
     results = frappe.db.sql("""
         SELECT 
@@ -110,7 +124,8 @@ def is_last_document(doc):
     if not results:
         return True
     return True if results[0][0] == doc.name else False
-        
+
+
 def fetch_print_heading_if_missing(doc, go_silently=False):
     if doc.select_print_heading:
         return False
