@@ -1,0 +1,156 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{retention_description} - {abbr}",
+ "creation": "2023-05-12 09:59:03.376948",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "company",
+  "column_break_3",
+  "abbr",
+  "applicable_for",
+  "section_break_6",
+  "account",
+  "column_break_8",
+  "cost_center",
+  "section_break_9",
+  "retention_description",
+  "retention_type",
+  "retention_category",
+  "column_break_14",
+  "retention_rate"
+ ],
+ "fields": [
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "company.abbr",
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "Abbr",
+   "read_only": 1
+  },
+  {
+   "fieldname": "retention_description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Retention Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Receive",
+   "fieldname": "applicable_for",
+   "fieldtype": "Select",
+   "label": "Applicable for",
+   "options": "Pay\nReceive"
+  },
+  {
+   "default": "ITBIS",
+   "fieldname": "retention_type",
+   "fieldtype": "Select",
+   "label": "Retention Type",
+   "options": "ITBIS\nISR\nDISCOUNT"
+  },
+  {
+   "depends_on": "eval:doc.retention_type===\"ISR\"",
+   "fieldname": "retention_category",
+   "fieldtype": "Select",
+   "label": "Retention Category",
+   "mandatory_depends_on": "eval:doc.retention_type===\"ISR\"",
+   "options": "\n01 - ALQUILERES\n02 - HONORARIOS POR SERVICIOS\n03 - OTRAS RENTAS\n04 - OTRAS RENTAS (Rentas Presuntas)\n05 - INTERESES PAGADOS A PERSONAS JURIDICAS RESIDENTES\n06 - INTERESES PAGADOS A PERSONAS FISICAS RESIDENTES\n07 - RETENCION POR PROVEEDORES DEL ESTADO\n08 - JUEGOS TELEFONICOS"
+  },
+  {
+   "default": "1",
+   "description": "Disable if you don't want this option to show for selection",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "retention_rate",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Retention Rate",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-05-24 15:17:39.252569",
+ "modified_by": "Administrator",
+ "module": "DGII",
+ "name": "Retention",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

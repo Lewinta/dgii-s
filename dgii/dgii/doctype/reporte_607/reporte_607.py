@@ -9,12 +9,19 @@ from frappe.model.document import Document
 from frappe.utils.csvutils import UnicodeWriter
 import time
 
+
+class ReferenceNotFound(Exception):
+    pass
+
+
 class Reporte607(Document):
-	pass
+    pass
+
 
 @frappe.whitelist()
 def get_file_address(from_date, to_date):
-	result = frappe.db.sql("""
+    # AND sinv.posting_date BETWEEN '%s' AND '%s' """ % ("SINV-%", from_date, to_date), as_dict=True)
+    result = frappe.db.sql(f"""
 		SELECT 
 			cust.tax_id,
 			cust.tipo_rnc,
@@ -40,76 +47,128 @@ def get_file_address(from_date, to_date):
 			0 bonos_regalo,
 			0 permuta_de_pago,
 			0 otros
-		FROM `tabSales Invoice` AS sinv 
-		JOIN tabCustomer AS cust on sinv.customer = cust.name 
-		WHERE sinv.ncf NOT LIKE '%s' AND cust.tax_id > 0 AND sinv.docstatus = 1 AND sinv.posting_date 
-		BETWEEN '%s' AND '%s' """ % ("SINV-%", from_date, to_date), as_dict=True)
+		FROM 
+        	`tabSales Invoice` AS sinv 
+		INNER JOIN 
+        	`tabCustomer` AS cust 
+        ON 
+        	sinv.customer = cust.name 
+        LEFT JOIN
+            `tabPayment Entry Reference` AS per
+        ON
+            per.reference_name = sinv.name
+        LEFT JOIN
+            `tabPayment Entry` AS pe
+        ON
+            pe.name = per.parent
+		WHERE 
+        	sinv.ncf NOT LIKE '%s'
+            AND cust.tax_id > 0 
+            AND sinv.docstatus = 1 
+            AND sinv.posting_date BETWEEN {from_date!r} AND {to_date!r}
+        	OR pe.posting_date BETWEEN {from_date!r} AND {to_date!r}
+	""", as_dict=True, debug=True)
 
-	w = UnicodeWriter()
-	w.writerow([
-		'RNC/Cedula o Pasaporte',
-		'Tipo de Identificacion',
-		'Numero de Comprobante Fiscal',
-		'Numero de Comprobante Fiscal modificado',
-		'Tipo de Ingreso',
-		'Fecha de Comprobante',
-		'Fecha de Retencion',
-		'Monto Facturado',
-		'ITBIS Facturado',
-		'ITBIS Retenido por Terceros',
-		'ITBIS Percibido',
-		'Retencion Renta por Terceros',
-		'ISR Percibido',
-		'Impuesto Selectivo al Consumo',
-		'Otros Impuestos y Tasas',
-		'Monto Propina Legal',
-		'Efectivo',
-		'Cheque/Transferencia/Deposito',
-		'Tarjeta de Debito/Credito',
-		'Venta Credito',
-		'Bonos o Certificados de Regalo',
-		'Permuta',
-		'Otras Formas de Venta'
-	])
-		
-	for row in result:
-		w.writerow([
-			row.tax_id.replace("-", ""),
-			row.tipo_rnc,
-			row.ncf,
-			row.return_against_ncf,
-			row.tipo_de_ingreso,
-			row.posting_date.strftime("%Y%m%d"),
-			row.payment_date.strftime("%Y%m%d") if row.payment_date  else "",
-			row.base_total,
-			row.base_total_taxes_and_charges,
-			row.retention_amount,
-			row.itbis_percibido or "",
-			row.retention_renta_terceros,
-			row.isr_percibido or "",
-			row.impuesto_selectivo_al_consumo,
-			row.otros_impuestos_y_tasas,
-			row.monto_propina_legal,
-			row.cash_payment or .00,
-			row.bank_payment or .00,
-			row.cc_payment or .00,
-			row.credit or row.base_grand_total,
-			row.bonos_regalo or .00,
-			row.permuta_de_pago or .00,
-			row.otros or .00
-		])
+    w = UnicodeWriter()
+    w.writerow([
+        'RNC/Cedula o Pasaporte',               									# 0
+        'Tipo de Identificacion',      												# 1
+        'Numero de Comprobante Fiscal',         									# 2
+        'Numero de Comprobante Fiscal modificado', 									# 3
+        'Tipo de Ingreso', 															# 4
+        'Fecha de Comprobante',														# 5
+        'Fecha de Retencion',														# 6
+        'Monto Facturado',															# 7
+        'ITBIS Facturado',															# 8
+        'ITBIS Retenido por Terceros',             									# 9
+        'ITBIS Percibido',															# 10
+        'Retencion Renta por Terceros',												# 11
+        'ISR Percibido',															# 12
+        'Impuesto Selectivo al Consumo',											# 13
+        'Otros Impuestos y Tasas',													# 14
+        'Monto Propina Legal',														# 15
+        'Efectivo',																	# 16
+        'Cheque/Transferencia/Deposito',											# 17
+        'Tarjeta de Debito/Credito',												# 18
+        'Venta Credito',															# 19
+        'Bonos o Certificados de Regalo',											# 20
+        'Permuta',																	# 21
+        'Otras Formas de Venta'														# 22
+    ])
 
-	frappe.response['result'] = cstr(w.getvalue())
-	frappe.response['type'] = 'csv'
-	frappe.response['doctype'] = "Reporte_607_" + str(int(time.time()))
+    for row in result:
+        w.writerow([
+            # 0
+            row.tax_id.replace("-", ""),
+            row.tipo_rnc,															# 1
+            row.ncf,																# 2
+            row.return_against_ncf,													# 3
+            row.tipo_de_ingreso,													# 4
+            row.posting_date.strftime("%Y%m%d"),									# 5
+            # 6   row.payment_date.strftime("%Y%m%d") if row.payment_date  else "",
+            get_retention_date(row),
+            row.base_total,															# 7
+            row.base_total_taxes_and_charges,										# 8
+            # 9   row.retention_amount,
+            get_retention_amount(row, typeof="ITBIS"),
+            row.itbis_percibido or "",												# 10
+            # 11  row.retention_renta_terceros,
+            get_retention_amount(row, typeof="ISR"),
+            row.isr_percibido or "",												# 12
+            row.impuesto_selectivo_al_consumo,										# 13
+            row.otros_impuestos_y_tasas,											# 14
+            row.monto_propina_legal,												# 15
+            row.cash_payment or .00,												# 16
+            row.bank_payment or .00,												# 17
+            row.cc_payment or .00,													# 18
+            row.credit or row.base_grand_total,										# 19
+            row.bonos_regalo or .00,												# 20
+            row.permuta_de_pago or .00,												# 21
+            row.otros or .00														# 22
+        ])
 
-
-
-
-
-
- 	
+    frappe.response['result'] = cstr(w.getvalue())
+    frappe.response['type'] = 'csv'
+    frappe.response['doctype'] = "Reporte_607_" + str(int(time.time()))
 
 
+def get_retention_date(row):
+    try:
+        reference_row = get_reference_row(row)
+    except ReferenceNotFound:
+        return 0
+    else:
+        posting_date = frappe.get_value(
+            "Payment Entry", reference_row.parent, "posting_date")
+        return frappe.utils.getdate(posting_date).strftime("%Y%m")
 
 
+def get_retention_amount(row, typeof):
+    if typeof not in ["ITBIS", "ISR"]:
+        return 0
+
+    try:
+        reference_row = get_reference_row(row, typeof)
+    except ReferenceNotFound:
+        return 0
+    else:
+        return reference_row.retention_amount
+
+
+def get_reference_row(row, typeof=None):
+    # will return the row of the Payment Entry that has the same reference as the Purchase Invoice
+    # if set, else will return empty string
+    doctype = "Payment Entry Reference"
+    filters = {
+        "reference_doctype": "Purchase Invoice",
+        "reference_name": row.name,
+        # "doctatus": "1",
+    }
+
+    if typeof is not None:
+        filters["retention_type"] = typeof
+
+    if frappe.db.exists(doctype, filters):
+        return frappe.get_doc(doctype, filters)
+
+    raise ReferenceNotFound()

@@ -16,56 +16,56 @@ app_license = "MIT"
 # --------
 
 fixtures = [
-	{
-		"doctype": "Custom Field",
-		"filters": {
-			"name": (
-				"in", (
-					"Customer-tipo_rnc",
-					"Item-item_type",
-					"Purchase Invoice Item-item_type",
-					"Purchase Invoice-excise_tax",
-					"Purchase Invoice-include_isr",
-					"Purchase Invoice-include_retention",
-					"Purchase Invoice-isr_amount",
-					"Purchase Invoice-isr_rate",
-					"Purchase Invoice-legal_tip",
-					"Purchase Invoice-monto_facturado_bienes",
-					"Purchase Invoice-monto_facturado_servicios",
-					"Purchase Invoice-other_taxes",
-					"Purchase Invoice-retention_amount",
-					"Purchase Invoice-retention_rate",
-					"Purchase Invoice-tax_id",
-					"Purchase Invoice-tipo_bienes_y_servicios_comprados",
-					"Purchase Invoice-total_itbis",
-					"Sales Invoice-ncf",
-					"Sales Invoice-return_against_ncf",
-					"Sales Invoice-tipo_de_anulacion",
-					"Sales Taxes and Charges-tax_type",
-					"Supplier-tipo_rnc",
-					"Sales Invoice-tipo_de_ingreso",
-				)
-			)
-		}
-	},
-	{
-		"doctype": "Property Setter",
-		"filters": {
-			"name": (
-				"in", (
-					"Purchase Invoice-apply_tds-hidden",
-					"Sales Invoice-naming_series-options",
-					"Sales Invoice-naming_series-description",
-					"Sales Invoice-naming_series-default",
-					"Sales Invoice-naming_series-print_hide",
-					"Sales Invoice-naming_series-label",
-					"Sales Invoice-naming_series-bold",
-					"Sales Invoice-naming_series-reqd",
-					"Supplier-tax_withholding_category-hidden",
-				)
-			)
-		}
-	}	
+    {
+        "doctype": "Custom Field",
+        "filters": {
+            "name": (
+                "in", (
+                    "Customer-tipo_rnc",
+                    "Item-item_type",
+                    "Purchase Invoice Item-item_type",
+                    "Purchase Invoice-excise_tax",
+                    "Purchase Invoice-include_isr",
+                    "Purchase Invoice-include_retention",
+                    "Purchase Invoice-isr_amount",
+                    "Purchase Invoice-isr_rate",
+                    "Purchase Invoice-legal_tip",
+                    "Purchase Invoice-monto_facturado_bienes",
+                    "Purchase Invoice-monto_facturado_servicios",
+                    "Purchase Invoice-other_taxes",
+                    "Purchase Invoice-retention_amount",
+                    "Purchase Invoice-retention_rate",
+                    "Purchase Invoice-tax_id",
+                    "Purchase Invoice-tipo_bienes_y_servicios_comprados",
+                    "Purchase Invoice-total_itbis",
+                    "Sales Invoice-ncf",
+                    "Sales Invoice-return_against_ncf",
+                    "Sales Invoice-tipo_de_anulacion",
+                    "Sales Taxes and Charges-tax_type",
+                    "Supplier-tipo_rnc",
+                    "Sales Invoice-tipo_de_ingreso",
+                )
+            )
+        }
+    },
+    {
+        "doctype": "Property Setter",
+        "filters": {
+            "name": (
+                "in", (
+                    "Purchase Invoice-apply_tds-hidden",
+                    "Sales Invoice-naming_series-options",
+                    "Sales Invoice-naming_series-description",
+                    "Sales Invoice-naming_series-default",
+                    "Sales Invoice-naming_series-print_hide",
+                    "Sales Invoice-naming_series-label",
+                    "Sales Invoice-naming_series-bold",
+                    "Sales Invoice-naming_series-reqd",
+                    "Supplier-tax_withholding_category-hidden",
+                )
+            )
+        }
+    }
 ]
 
 # Includes in <head>
@@ -95,13 +95,13 @@ fixtures = [
 # Doctype JS
 # ----------
 doctype_js = {
-	"Purchase Invoice": "public/js/purchase_invoice.js",
-	"Customer": "public/js/customer.js",
-	"Supplier": "public/js/supplier.js",
-	"Landed Cost Voucher": "public/js/landed_cost_voucher.js",
-	"Company": "public/js/company.js",
-	"Purchase Order": "public/js/purchase_order.js",
-	"Payment Entry": "public/js/payment_entry.js",
+    "Purchase Invoice": "public/js/purchase_invoice.js",
+    "Customer": "public/js/customer.js",
+    "Supplier": "public/js/supplier.js",
+    "Landed Cost Voucher": "public/js/landed_cost_voucher.js",
+    "Company": "public/js/company.js",
+    "Purchase Order": "public/js/purchase_order.js",
+    "Payment Entry": "public/js/payment_entry.js",
 }
 
 # Generators
@@ -139,18 +139,18 @@ doctype_js = {
 # Hook on document methods and events
 
 doc_events = {
-	# erpnext
-	"Purchase Invoice": {
-		"validate": "dgii.hook.purchase_invoice.validate",
-		"before_submit": "dgii.hook.purchase_invoice.before_submit",
-	},
+    # erpnext
+    "Purchase Invoice": {
+        "validate": "dgii.hook.purchase_invoice.validate",
+        "before_submit": "dgii.hook.purchase_invoice.before_submit",
+    },
     "Sales Invoice": {
         "autoname": "dgii.hook.sales_invoice.autoname",
         "before_insert": "dgii.hook.sales_invoice.before_insert",
         "on_change": "dgii.hook.sales_invoice.on_change",
         "on_trash": "dgii.hook.sales_invoice.on_trash",
     },
-	"Landed Cost Voucher": {
+    "Landed Cost Voucher": {
         "on_submit": "dgii.hook.landed_cost_voucher.on_submit",
     },
 }
@@ -186,10 +186,17 @@ after_migrate = "dgii.migrate.after_migrate"
 
 # before_tests = "dgii.install.before_tests"
 
+# Overriding DocType Class
+# ------------------------------
+#
+override_doctype_class = {
+    "Payment Entry": "dgii.hook.payment_entry.PaymentEntry",
+}
+
+
 # Overriding Whitelisted Methods
 # ------------------------------
 #
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "dgii.event.get_events"
 # }
-	
