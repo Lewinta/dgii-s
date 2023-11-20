@@ -78,19 +78,30 @@ frappe.ui.form.on("Purchase Invoice", {
 		if (!frm.doc.include_retention || !frm.doc.total_taxes_and_charges || !frm.doc.retention_rate)
 			frm.set_value("retention_amount", 0);
 		let retention_rate = 0;
-		if (frm.doc.retention_rate == '30%')
-			retention_rate = 0.30;
-		
-		if (frm.doc.retention_rate == '100%')
-			retention_rate = 1;
-		
-		frm.set_value("retention_amount", frm.doc.total_taxes_and_charges * retention_rate);		
+		let amount = 0;
+		if (frm.doc.retention_rate == '30%'){
+			// Vamos a sumar todos los productos con el campo item_type = "Servicio"
+			let monto_facturado_servicios = 0;
+			frappe.run_serially([
+				() => $.map(frm.doc.items, item => amount += item.item_type == "Servicios" ? item.amount: 0),
+				() => frm.set_value("monto_facturado_servicios", monto_facturado_servicios),
+				() => retention_rate = 0.30,
+				() => frm.set_value("retention_amount", amount * retention_rate * 0.18),
+				() => frm.set_value("base_retention_amount", amount * frm.doc.conversion_rate * retention_rate * 0.18)
+			])		
+		}
+		if (frm.doc.retention_rate == '100%'){
+			// Se retiene el 100% de los impuestos
+			frm.set_value("retention_amount", frm.doc.total_taxes_and_charges);
+			frm.set_value("base_retention_amount", frm.doc.total_taxes_and_charges * frm.doc.conversion_rate)
+		}
 	},
 	calculate_isr(frm){
 		if (!frm.doc.include_isr || !frm.doc.total || !frm.doc.isr_rate)
 			frm.set_value("isr_amount", 0);
 		let amount = frm.doc.total * (frm.doc.isr_rate/ 100);
 		frm.set_value("isr_amount", amount);
+		frm.set_value("base_isr_amount", amount * frm.doc.conversion_rate);
 	}
 });
 

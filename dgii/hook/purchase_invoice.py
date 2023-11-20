@@ -4,8 +4,8 @@ from frappe.utils import cint
 TAX_CATEGORIES_PERMITTED = ['Proveedor Informal','Gastos Menores']
 
 def validate(doc, event):
-	set_taxes(doc)
 	calculate_totals(doc)
+	set_taxes(doc)
 	validate_duplicate_ncf(doc)
 	set_against_ncf(doc)
 
@@ -17,10 +17,10 @@ def calculate_totals(doc):
 
 	for item in doc.items:
 		if item.item_type == "Bienes":
-			total_bienes += item.amount
+			total_bienes += item.base_amount
 		
 		if item.item_type == "Servicios":
-			total_servicios += item.amount
+			total_servicios += item.base_amount
 	
 	doc.monto_facturado_bienes = total_bienes
 	doc.monto_facturado_servicios = total_servicios
@@ -73,7 +73,12 @@ def get_serie_for_(doc):
 
 	return frappe.get_doc("Comprobantes Conf", filters)
 
-def set_taxes(doc):	
+def set_taxes(doc):
+	set_other_taxes(doc)
+	set_isr(doc)
+	set_retention(doc)
+
+def set_other_taxes(doc):	
 	conf = frappe.get_single(
 		"DGII Settings"
 	)
@@ -124,6 +129,32 @@ def set_taxes(doc):
 				]
 			)
 			doc.set(tax.tax_type, total_amount)
+
+
+def set_isr(doc):
+	if doc.include_isr or  not doc.total or not doc.isr_rate:
+		doc.isr_amount = 0
+	amount = doc.total * float(doc.isr_rate) / 100.00
+	doc.isr_amount = amount
+	doc.base_isr_amount = amount * doc.conversion_rate
+
+def set_retention(doc):
+	if doc.include_retention or not doc.total_taxes_and_charges or not doc.retention_rate:
+		doc.retention_amount = 0
+	retention_rate = 0
+	
+	amount = 0
+	
+	if doc.retention_rate == '30%':
+		# Se le calcula el 30% del de los items marcados como servicios
+		retention_rate = 0.30
+		amount = doc.monto_facturado_servicios
+	if doc.retention_rate == '100%':
+		amount = doc.total_taxes_and_charges
+		retention_rate = 1
+	
+	doc.retention_amount = amount * 0.18 * retention_rate
+	doc.base_retention_amount = amount * doc.conversion_rate * retention_rate
 
 def validate_duplicate_ncf(doc):
 	if not doc.bill_no:
