@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright (c) 2015, Soldeva, SRL and contributors
+# Copyright (c) 2023, Lewin Villar and contributors
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
@@ -11,56 +10,107 @@ import time
 from frappe import _
 
 
-class ReferenceNotFound(Exception):
-    pass
-
-
 class Reporte606(Document):
+    pass
+ 
+
+class ReferenceNotFound(Exception):
     pass
 
 
 @frappe.whitelist()
 def get_file_address(from_date, to_date):
     result = frappe.db.sql(f"""
-		SELECT 
-			pinv.name,
-			pinv.tax_id,
-			supl.tipo_rnc,
-			pinv.tipo_bienes_y_servicios_comprados,
-			pinv.bill_no,
-			pinv.bill_date,
-			pinv.excise_tax,
-			pinv.base_taxes_and_charges_added,
-			pinv.retention_amount,
-			pinv.isr_amount,
-			pinv.retention_type,
-			pinv.total_itbis,
-			pinv.total_taxes_and_charges,
-			pinv.other_taxes,
-			pinv.legal_tip,
-			pinv.base_total,
-			pinv.monto_facturado_servicios,
-			pinv.monto_facturado_bienes,
-			pinv.mop
-		FROM 
-			`tabPurchase Invoice` AS pinv
-	    INNER JOIN 
-			`tabSupplier` AS supl
-		ON 
-			supl.name = pinv.supplier
-        LEFT JOIN
-            `tabPayment Entry Reference` AS per
-        ON
-            per.reference_name = pinv.name
-        LEFT JOIN
-            `tabPayment Entry` AS pe
-        ON
-            pe.name = per.parent
-		WHERE
-			pinv.docstatus = 1 
-            AND pinv.bill_date BETWEEN {from_date!r} AND {to_date!r}
-            OR pe.posting_date BETWEEN {from_date!r} AND {to_date!r}
-	""", as_dict=True, debug=True)
+SELECT 
+    pinv.name,
+    pinv.tax_id,
+    supl.tipo_rnc,
+    pinv.tipo_bienes_y_servicios_comprados,
+    pinv.bill_no,
+    pinv.bill_date,
+    pinv.excise_tax,
+    pinv.base_taxes_and_charges_added,
+    CASE 
+        WHEN pe.posting_date BETWEEN {from_date!r} AND {to_date!r} THEN pinv.retention_amount
+        ELSE 0
+    END AS retention_amount,
+    CASE
+        WHEN pe.posting_date <> pinv.posting_date AND pinv.retention_amount > 0 THEN 1
+        ELSE 0
+    END AS show_in_other_month_report,
+    pinv.retention_type,
+    pinv.total_itbis,
+    pinv.total_taxes_and_charges,
+    pinv.other_taxes,
+    pinv.legal_tip,
+    pinv.base_total,
+    pinv.monto_facturado_servicios,
+    pinv.monto_facturado_bienes,
+    per.isr_category,
+    per.isr_amount,
+    pinv.mop
+FROM 
+    `tabPurchase Invoice` AS pinv
+INNER JOIN 
+    `tabSupplier` AS supl ON supl.name = pinv.supplier
+LEFT JOIN (
+    SELECT 
+        parent, MAX(posting_date) AS last_payment_date
+    FROM 
+        `tabPayment Entry`
+    WHERE 
+        docstatus = 1
+    GROUP BY 
+        parent
+) AS pe_last ON pe_last.parent = pinv.name
+LEFT JOIN
+    `tabPayment Entry` AS pe ON pe.name = pe_last.parent AND pe.posting_date = pe_last.last_payment_date
+LEFT JOIN
+    `tabPayment Entry Reference` AS per ON per.reference_name = pinv.name AND per.parent = pe.name
+WHERE
+    pinv.docstatus = 1
+    AND pinv.posting_date BETWEEN {from_date!r} AND {to_date!r}
+
+UNION ALL
+
+SELECT 
+    pinv.name,
+    pinv.tax_id,
+    supl.tipo_rnc,
+    pinv.tipo_bienes_y_servicios_comprados,
+    pinv.bill_no,
+    pinv.bill_date,
+    pinv.excise_tax,
+    pinv.base_taxes_and_charges_added,
+    pinv.retention_amount,
+    pinv.isr_amount,
+    pinv.retention_type,
+    pinv.total_itbis,
+    pinv.total_taxes_and_charges,
+    pinv.other_taxes,
+    pinv.legal_tip,
+    pinv.base_total,
+    pinv.monto_facturado_servicios,
+    pinv.monto_facturado_bienes,
+    per.isr_category,
+    per.isr_amount,
+    pinv.mop
+FROM 
+    `tabPayment Entry Reference` AS per
+INNER JOIN
+    `tabPayment Entry` AS pe ON pe.name = per.parent
+LEFT JOIN
+    `tabPurchase Invoice` AS pinv ON per.reference_name = pinv.name
+LEFT JOIN
+    `tabSupplier` AS supl ON supl.name = pinv.supplier
+WHERE
+    pinv.docstatus = 1
+    AND per.docstatus = 1
+    AND pe.posting_date BETWEEN {from_date!r} AND {to_date!r}
+    AND pinv.posting_date < {from_date!r}
+    AND per.retention_amount > 0
+    AND per.isr_amount > 0
+	""", as_dict=True)
 
     w = UnicodeWriter()
     w.writerow([
@@ -83,7 +133,8 @@ def get_file_address(from_date, to_date):
         'ITBIS llevado al Costo',                                         # 16
         'ITBIS por Adelantar',                                            # 17
         'ITBIS percibido en compras',                                     # 18
-        'Tipo de Retencion en ISR',                                       # 19
+        # 19 (Cambiar 'isr_type' por 'Tipo de Retencion en ISR')
+        'Tipo de Retencion en ISR',
         'Monto Retencion Renta',                                          # 20
         'ISR Percibido en compras',                                       # 21
         'Impuesto Selectivo al Consumo',                                  # 22
@@ -112,15 +163,18 @@ def get_file_address(from_date, to_date):
             row.base_total,					# Monto Facturado
             # row.total_taxes_and_charges,	# ITBIS Facturado Cecilia lo pidio actualizar on 25 feb 21
             row.total_itbis,				# ITBIS Facturado
-            get_retention_amount(row, typeof="ITBIS"),  	# ITBIS Retenido
+            get_retention_amount(row, typeof="ITBIS",
+                                 from_date=from_date),  	# ITBIS Retenido
             '0',  							# ITBIS sujeto a Proporcionalidad (Art. 349)
             '0',  							# ITBIS por Adelantar
             row.total_itbis or 0, 			# ITBIS llevado al Costo
             '0',  							# ITBIS percibido en compras
-            # row.retention_type.split("-")[0] if row.retention_type else '',  							# Tipo de Retención en ISR
-            get_retention_type(row),				# Tipo de Retención en ISR
+            # row.retention_type.split("-")[0] if row.retention_type else '',
+            row.isr_category,					# Tipo de Retención en ISR
+            row.isr_amount or 0,  			# Monto Retención Renta
+            # get_retention_type(row),				# Tipo de Retención en ISR
             # Monto Retención Renta
-            get_retention_amount(row, typeof="ISR"),
+            # get_retention_amount(row, typeof="ISR"),
             '0',  							# ISR Percibido en compras
             row.excise_tax or 0,  			# Impuesto Selectivo al Consumo
             row.other_taxes or 0,  			# Otros Impuesto/Tasas
@@ -128,6 +182,7 @@ def get_file_address(from_date, to_date):
             row.mop, 						# Forma de Pago
         ])
 
+    # Resto del código sin cambios
     frappe.response['result'] = cstr(w.getvalue())
     frappe.response['type'] = 'csv'
     frappe.response['doctype'] = "Reporte_606_" + str(int(time.time()))
@@ -144,7 +199,13 @@ def get_retention_date(row):
         return frappe.utils.getdate(posting_date).strftime("%Y%m")
 
 
-def get_retention_amount(row, typeof):
+def get_retention_amount(row, typeof, from_date):
+    retention_date = get_retention_date(row)
+    bill_date = frappe.utils.getdate(from_date).strftime("%Y%m")
+
+    if retention_date == 0 or bill_date != retention_date:
+        return 0
+
     if typeof not in ["ITBIS", "ISR"]:
         return 0
 

@@ -8,7 +8,20 @@ import frappe
 
 
 def execute():
+    create_retention_doctype()
     create_custom_fields()
+
+
+def create_retention_doctype():
+    filepath = get_absolute_path("retention.json")
+    with open(filepath) as archive:
+        doc = json.load(archive)
+
+    if frappe.db.exists("DocType", doc.get("name")):
+        return
+
+    doc = frappe.get_doc(doc)
+    doc.insert()
 
 
 def create_custom_fields():

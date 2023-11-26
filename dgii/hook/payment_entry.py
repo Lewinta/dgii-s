@@ -22,7 +22,7 @@ class PaymentEntry(payment_entry.PaymentEntry):
         if retention.retention_type == "ITBIS":
             amount = reference.base_total_taxes_and_charges * retention.retention_rate / 100.0
         else:
-            amount = reference.base_grand_total * retention.retention_rate / 100.0
+            amount = reference.total * retention.retention_rate / 100.0
 
         return {
             "amount": amount,
@@ -33,6 +33,12 @@ class PaymentEntry(payment_entry.PaymentEntry):
             "retention_description": retention.retention_description,
             "retention_category": retention.retention_category,
         }
+
+    @frappe.whitelist()
+    def get_subtotal(self, reference_doctype, reference_name, isr_rate):
+        doc = frappe.get_doc(reference_doctype, reference_name)
+
+        return doc.total * isr_rate / 100.0
 
     def get_retention(self, name):
         doctype = "Retention"

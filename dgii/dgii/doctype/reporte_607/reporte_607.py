@@ -37,6 +37,8 @@ def get_file_address(from_date, to_date):
 			0 as itbis_percibido,
 			0 as retention_renta_terceros,
 			0 as isr_percibido,
+            per.isr_category,
+            per.isr_amount,
 			0 as impuesto_selectivo_al_consumo,
 			0 as otros_impuestos_y_tasas,
 			0 as monto_propina_legal,
@@ -67,7 +69,9 @@ def get_file_address(from_date, to_date):
             AND sinv.docstatus = 1 
             AND sinv.posting_date BETWEEN {from_date!r} AND {to_date!r}
         	OR pe.posting_date BETWEEN {from_date!r} AND {to_date!r}
-	""", as_dict=True, debug=True)
+            AND per.retention_amount > 0
+            AND per.isr_amount > 0
+	""", as_dict=True)
 
     w = UnicodeWriter()
     w.writerow([
@@ -83,7 +87,9 @@ def get_file_address(from_date, to_date):
         'ITBIS Retenido por Terceros',             									# 9
         'ITBIS Percibido',															# 10
         'Retencion Renta por Terceros',												# 11
-        'ISR Percibido',															# 12
+        'ISR Percibido',
+        'ISR Categoria',															# 12
+        'Monto ISR',
         'Impuesto Selectivo al Consumo',											# 13
         'Otros Impuestos y Tasas',													# 14
         'Monto Propina Legal',														# 15
@@ -99,7 +105,7 @@ def get_file_address(from_date, to_date):
     for row in result:
         w.writerow([
             # 0
-            row.tax_id.replace("-", ""),
+            cstr(row.tax_id).replace("-", ""),
             row.tipo_rnc,															# 1
             row.ncf,																# 2
             row.return_against_ncf,													# 3
@@ -110,11 +116,13 @@ def get_file_address(from_date, to_date):
             row.base_total,															# 7
             row.base_total_taxes_and_charges,										# 8
             # 9   row.retention_amount,
-            get_retention_amount(row, typeof="ITBIS"),
+            get_retention_amount(row, typeof="ITBIS", from_date=from_date),
             row.itbis_percibido or "",												# 10
             # 11  row.retention_renta_terceros,
-            get_retention_amount(row, typeof="ISR"),
+            get_retention_amount(row, typeof="ISR", from_date=from_date),
             row.isr_percibido or "",												# 12
+            row.isr_category,
+            row.isr_amount or 0,
             row.impuesto_selectivo_al_consumo,										# 13
             row.otros_impuestos_y_tasas,											# 14
             row.monto_propina_legal,												# 15
@@ -143,7 +151,13 @@ def get_retention_date(row):
         return frappe.utils.getdate(posting_date).strftime("%Y%m")
 
 
-def get_retention_amount(row, typeof):
+def get_retention_amount(row, typeof, from_date):
+    retention_date = get_retention_date(row)
+    bill_date = frappe.utils.getdate(from_date).strftime("%Y%m")
+
+    if retention_date == 0 or bill_date != retention_date:
+        return 0
+
     if typeof not in ["ITBIS", "ISR"]:
         return 0
 
@@ -153,6 +167,17 @@ def get_retention_amount(row, typeof):
         return 0
     else:
         return reference_row.retention_amount
+
+
+def get_retention_type(row):
+    # will return the retention_category of the retention selected in the Payment Entry
+    # if set, else will return empty string
+    try:
+        reference_row = get_reference_row(row, typeof="ISR")
+    except ReferenceNotFound:
+        return ""
+    else:
+        return reference_row.retention_category
 
 
 def get_reference_row(row, typeof=None):
