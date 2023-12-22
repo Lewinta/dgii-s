@@ -3,6 +3,7 @@ frappe.ui.form.on("Purchase Invoice", {
 	validate(frm){
 		frm.trigger("bill_no");
 		frm.trigger("validate_cost_center");
+		frm.trigger("validate_ncf")
 	},
 	bill_no(frm){
 		let {bill_no} = frm.doc;
@@ -13,7 +14,6 @@ frappe.ui.form.on("Purchase Invoice", {
 			return
 		
 		frm.set_value("bill_no", bill_no.trim().toUpperCase())
-		frm.trigger("validate_ncf")
 	},
 	validate_ncf(frm){
 		let len = frm.doc.bill_no.length;
