@@ -38,7 +38,7 @@ def get_file_address(from_date, to_date):
 			0 as retention_renta_terceros,
 			0 as isr_percibido,
             per.isr_category,
-            per.isr_amount,
+            SUM(per.isr_amount),
 			0 as impuesto_selectivo_al_consumo,
 			0 as otros_impuestos_y_tasas,
 			0 as monto_propina_legal,
@@ -71,6 +71,8 @@ def get_file_address(from_date, to_date):
         	OR pe.posting_date BETWEEN {from_date!r} AND {to_date!r}
             AND per.retention_amount > 0
             AND per.isr_amount > 0
+        GROUP BY 
+            sinv.name
 	""", as_dict=True)
 
     w = UnicodeWriter()
